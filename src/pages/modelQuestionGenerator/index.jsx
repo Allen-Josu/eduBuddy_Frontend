@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { AlertCircle, BookOpen, FileText } from "lucide-react";
 import Button from "../../components/ui/button";
 import Card from "antd/es/card/Card";
-import { Download } from "lucide-react"; // Icon for the download button
+import { Download } from "lucide-react";
 import jsPDF from "jspdf";
 import {
   CardContent,
@@ -13,20 +12,24 @@ import {
 } from "../../components/ui/card";
 import Header from "../../components/Header";
 
+const baseUrl = import.meta.env.VITE_PYTHON_URL;
 
 export default function QuestionPaperGenerator() {
-  const [files, setFiles] = useState({ syllabus: null});
-  const [fileNames, setFileNames] = useState({ syllabus: ""});
+  const [files, setFiles] = useState({ syllabus: null });
+  const [fileNames, setFileNames] = useState({ syllabus: "" });
   const [isGenerated, setIsGenerated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-  const [extractedText, setExtractedText] = useState({ syllabus: ""});
+  const [extractedText, setExtractedText] = useState({ syllabus: "" });
   const [questionPaper, setQuestionPaper] = useState(null);
 
   const handleFileChange = (event, fileKey) => {
     const file = event.target.files[0];
     if (file) {
-      if (file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf")) {
+      if (
+        file.type === "application/pdf" ||
+        file.name.toLowerCase().endsWith(".pdf")
+      ) {
         setFiles((prev) => ({ ...prev, [fileKey]: file }));
         setFileNames((prev) => ({ ...prev, [fileKey]: file.name }));
         setMessage("");
@@ -42,15 +45,14 @@ export default function QuestionPaperGenerator() {
     if (files.syllabus) {
       setLoading(true);
       setMessage("");
-      setExtractedText({ syllabus: ""});
+      setExtractedText({ syllabus: "" });
       setQuestionPaper(null);
 
       try {
         const formData = new FormData();
         formData.append("syllabus_pdf", files.syllabus);
-        
 
-        const response = await fetch("http://127.0.0.1:5000/upload", {
+        const response = await fetch(`${baseUrl}/upload`, {
           method: "POST",
           body: formData,
         });
@@ -84,7 +86,9 @@ export default function QuestionPaperGenerator() {
     setMessage("");
     setExtractedText({ syllabus: "" });
     setQuestionPaper(null);
-    document.querySelectorAll('input[type="file"]').forEach((input) => (input.value = ""));
+    document
+      .querySelectorAll('input[type="file"]')
+      .forEach((input) => (input.value = ""));
   };
 
   const downloadPDF = () => {
@@ -95,7 +99,7 @@ export default function QuestionPaperGenerator() {
       const margin = 50;
       const contentWidth = pageWidth - margin * 2;
       let yPosition = 70;
-  
+
       // Title
       doc.setFont("helvetica", "bold");
       doc.setFontSize(18);
@@ -103,14 +107,19 @@ export default function QuestionPaperGenerator() {
         align: "center",
       });
       yPosition += 40;
-  
+
       // Duration and Max Marks
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
       doc.text(`Duration: ${questionPaper.duration}`, margin, yPosition);
-      doc.text(`Maximum Marks: ${questionPaper.max_marks}`, pageWidth - margin, yPosition, { align: "right" });
+      doc.text(
+        `Maximum Marks: ${questionPaper.max_marks}`,
+        pageWidth - margin,
+        yPosition,
+        { align: "right" }
+      );
       yPosition += 40;
-  
+
       // Instructions
       doc.setFont("helvetica", "italic");
       doc.text(
@@ -119,61 +128,61 @@ export default function QuestionPaperGenerator() {
         yPosition
       );
       yPosition += 40;
-  
+
       // Questions
       questionPaper.sections[0].questions.forEach((question, index) => {
         if (yPosition + 60 > pageHeight) {
           doc.addPage();
           yPosition = 70;
         }
-  
+
         // Extract question parts using regex
         const parts = question.match(/^(\d+\.\s*[^(]+)(.*)$/);
-        
+
         if (!parts) return;
-  
+
         // Main question
         const questionNumber = `${index + 1}.`; // Ensure correct numbering
-        const mainQuestionText = parts[1].replace(/^\d+\./, '').trim(); // Remove original number
+        const mainQuestionText = parts[1].replace(/^\d+\./, "").trim(); // Remove original number
         const fullMainQuestion = `${questionNumber} ${mainQuestionText}`;
-        
+
         const mainLines = doc.splitTextToSize(fullMainQuestion, contentWidth);
         doc.setFont("helvetica", "bold");
         doc.text(mainLines, margin, yPosition);
         yPosition += mainLines.length * 15 + 10;
-  
+
         // Sub-parts
         if (parts[2]) {
           doc.setFont("helvetica", "normal");
           const subParts = parts[2].trim().split(/\(\w\)/);
           subParts.shift(); // Remove empty first element
-          
+
           subParts.forEach((subPart, subIndex) => {
-            const subPartText = `(${String.fromCharCode(97 + subIndex)}) ${subPart.trim()}`;
-            const subPartLines = doc.splitTextToSize(subPartText, contentWidth - 20);
-            
+            const subPartText = `(${String.fromCharCode(
+              97 + subIndex
+            )}) ${subPart.trim()}`;
+            const subPartLines = doc.splitTextToSize(
+              subPartText,
+              contentWidth - 20
+            );
+
             if (yPosition + subPartLines.length * 15 > pageHeight) {
               doc.addPage();
               yPosition = 70;
             }
-            
+
             doc.text(subPartLines, margin + 20, yPosition);
             yPosition += subPartLines.length * 15 + 5;
           });
         }
-        
+
         yPosition += 20; // Space between questions
       });
-  
+
       // Save PDF
       doc.save(`${questionPaper.title}.pdf`);
     }
   };
-  
-  
-  
-  
-
 
   return (
     <>
@@ -213,12 +222,17 @@ export default function QuestionPaperGenerator() {
                           )}
                         </div>
                       </div>
-
-                      
                     </div>
 
                     {message && (
-                      <div className={`flex items-center gap-2 ${message.includes("Error") || message.includes("failed") ? "text-green-600" : "text-red-600"}`}>
+                      <div
+                        className={`flex items-center gap-2 ${
+                          message.includes("Error") ||
+                          message.includes("failed")
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
                         <AlertCircle className="h-4 w-4" />
                         <span className="text-sm">{message}</span>
                       </div>
@@ -278,47 +292,65 @@ export default function QuestionPaperGenerator() {
                 <div className="space-y-6">
                   {/* Title, Duration, and Maximum Marks */}
                   <div className="text-center space-y-2">
-                    <h2 className="text-2xl font-bold">{questionPaper.title}</h2>
-                    <p className="text-gray-600">Duration: {questionPaper.duration}</p>
-                    <p className="text-gray-600">Maximum Marks: {questionPaper.max_marks}</p>
+                    <h2 className="text-2xl font-bold">
+                      {questionPaper.title}
+                    </h2>
+                    <p className="text-gray-600">
+                      Duration: {questionPaper.duration}
+                    </p>
+                    <p className="text-gray-600">
+                      Maximum Marks: {questionPaper.max_marks}
+                    </p>
                   </div>
 
                   {/* Instructions */}
                   <div className="text-center">
                     <p className="text-gray-600">
-                      Answer any 5 questions. Each question carries {questionPaper.sections[0].marks_per_question} marks.
+                      Answer any 5 questions. Each question carries{" "}
+                      {questionPaper.sections[0].marks_per_question} marks.
                     </p>
                   </div>
 
                   {/* Questions */}
                   <div className="space-y-4">
-                    {questionPaper.sections[0].questions.map((questionText, index) => {
-                      // Remove the original question number and split into parts
-                      const withoutNumber = questionText.replace(/^\d+\.\s*/, '');
-                      const parts = withoutNumber.split(/(?=\([a-z]\))/);
-                      const mainQuestion = parts[0].trim();
-                      const subParts = parts.slice(1);
+                    {questionPaper.sections[0].questions.map(
+                      (questionText, index) => {
+                        // Remove the original question number and split into parts
+                        const withoutNumber = questionText.replace(
+                          /^\d+\.\s*/,
+                          ""
+                        );
+                        const parts = withoutNumber.split(/(?=\([a-z]\))/);
+                        const mainQuestion = parts[0].trim();
+                        const subParts = parts.slice(1);
 
-                      return (
-                        <div key={index} className="space-y-2">
-                          {/* Main Question */}
-                          <div className="text-gray-800">
-                            <span className="font-medium">{`${index + 1}.`}</span> {mainQuestion}
-                          </div>
-                          
-                          {/* Sub-Parts */}
-                          {subParts.length > 0 && (
-                            <div className="pl-4 space-y-1">
-                              {subParts.map((part, partIndex) => (
-                                <div key={partIndex} className="text-gray-800">
-                                  {part.trim()}
-                                </div>
-                              ))}
+                        return (
+                          <div key={index} className="space-y-2">
+                            {/* Main Question */}
+                            <div className="text-gray-800">
+                              <span className="font-medium">{`${
+                                index + 1
+                              }.`}</span>{" "}
+                              {mainQuestion}
                             </div>
-                          )}
-                        </div>
-                      );
-                    })}
+
+                            {/* Sub-Parts */}
+                            {subParts.length > 0 && (
+                              <div className="pl-4 space-y-1">
+                                {subParts.map((part, partIndex) => (
+                                  <div
+                                    key={partIndex}
+                                    className="text-gray-800"
+                                  >
+                                    {part.trim()}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -326,7 +358,6 @@ export default function QuestionPaperGenerator() {
           )}
         </div>
       </div>
-
     </>
   );
 }
