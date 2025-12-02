@@ -1,10 +1,10 @@
-import { Button, Form, Input, Select } from 'antd';
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { v4 as uuid } from 'uuid';
-import Header from '../../components/Header';
-import ToastNotification from '../../modals/Toast';
+import { Button, Form, Input, Select } from "antd";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { v4 as uuid } from "uuid";
+import Header from "../../components/Header";
+import ToastNotification from "../../components/modals/Toast";
 
 const BASE_URL = import.meta.env.VITE_URL;
 
@@ -12,18 +12,18 @@ function Signup() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastMessage, setToastMessage] = useState("");
 
   const courseOptions = [
-    { value: 'MCA', label: 'MCA' },
-    { value: 'MSC CS-DS', label: 'MSC CS-DS' },
-    { value: 'MSC CS-AI', label: 'MSC CS-AI' },
+    { value: "MCA", label: "MCA" },
+    { value: "MSC CS-DS", label: "MSC CS-DS" },
+    { value: "MSC CS-AI", label: "MSC CS-AI" },
   ];
 
   const handleSubmit = async (values) => {
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
@@ -32,19 +32,21 @@ function Signup() {
       await axios.post(`${BASE_URL}/users/`, {
         ...dataToSend,
         entityId: uuid(),
-        entity: 'users',
-        role: 'user',
-        department: 'DCA',
+        entity: "users",
+        role: "user",
+        department: "DCA",
       });
 
-      setToastMessage('You have successfully registered! Please log in to continue.');
+      await axios.post(`${BASE_URL}/send-otp`, { email: dataToSend.email });
+
+      setToastMessage("An OTP has been sent to your email");
       setToastOpen(true);
-      setTimeout(() => navigate('/login'), 2000);
+      setTimeout(() => navigate("/verify-otp"), 2000);
     } catch (err) {
       setError(
         err.response?.data?.message ||
-        err.message ||
-        'An error occurred during registration'
+          err.message ||
+          "An error occurred during registration"
       );
     } finally {
       setLoading(false);
@@ -56,30 +58,30 @@ function Signup() {
       <Header />
       <div
         style={{
-          backgroundColor: '#27272A',
-          minHeight: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          padding: '2rem',
+          backgroundColor: "#27272A",
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "2rem",
         }}
       >
         <div
           className="card shadow-lg"
           style={{
-            maxWidth: '500px',
-            width: '100%',
-            backgroundColor: '#ffffff',
-            borderRadius: '15px',
-            padding: '2rem',
+            maxWidth: "500px",
+            width: "100%",
+            backgroundColor: "#ffffff",
+            borderRadius: "15px",
+            padding: "2rem",
           }}
         >
           <h2
             className="text-center pb-4"
             style={{
-              fontSize: '1.75rem',
-              fontWeight: 'bold',
-              color: '#6d28d9',
+              fontSize: "1.75rem",
+              fontWeight: "bold",
+              color: "#6d28d9",
             }}
           >
             Sign Up
@@ -88,10 +90,10 @@ function Signup() {
             <div
               className="alert alert-danger"
               style={{
-                fontSize: '0.875rem',
-                marginBottom: '1rem',
-                borderRadius: '8px',
-                padding: '0.75rem',
+                fontSize: "0.875rem",
+                marginBottom: "1rem",
+                borderRadius: "8px",
+                padding: "0.75rem",
               }}
             >
               {error}
@@ -101,129 +103,136 @@ function Signup() {
             form={form}
             onFinish={handleSubmit}
             layout="vertical"
-            style={{ padding: '0 1rem' }}
+            style={{ padding: "0 1rem" }}
           >
             <Form.Item
               name="username"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Username</span>}
+              label={
+                <span style={{ fontWeight: "500", color: "#333" }}>
+                  Username
+                </span>
+              }
               rules={[
-                { required: true, message: 'Please input your username!' },
-                { pattern: /^[A-Za-z\s]+$/, message: 'Username must contain only letters!' }
+                { required: true, message: "Please input your username!" },
+                {
+                  pattern: /^[A-Za-z\s]+$/,
+                  message: "Username must contain only letters!",
+                },
               ]}
             >
               <Input
                 style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  padding: '0.8rem',
-                  height: '40px',
+                  backgroundColor: "#f9f9f9",
+                  border: "2px solid #6d28d9",
+                  borderRadius: "8px",
+                  padding: "0.8rem",
+                  height: "40px",
                 }}
               />
             </Form.Item>
 
             <Form.Item
               name="email"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Email</span>}
+              label={
+                <span style={{ fontWeight: "500", color: "#333" }}>Email</span>
+              }
               rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please enter a valid email!' }
+                { required: true, message: "Please input your email!" },
+                { type: "email", message: "Please enter a valid email!" },
               ]}
             >
               <Input
                 style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  padding: '0.8rem',
-                  height: '40px',
+                  backgroundColor: "#f9f9f9",
+                  border: "2px solid #6d28d9",
+                  borderRadius: "8px",
+                  padding: "0.8rem",
+                  height: "40px",
                 }}
               />
             </Form.Item>
 
-            {/* <Form.Item
-              name="studentId"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Student ID</span>}
-              rules={[
-                { required: true, message: 'Please input your student ID!' },
-                { pattern: /^\d{8}$/, message: 'Student ID must be exactly 8 digits!' }
-              ]}
-            >
-              <Input
-                style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  padding: '0.8rem',
-                  height: '40px',
-                }}
-              />
-            </Form.Item> */}
-
             <Form.Item
               name="course"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Course</span>}
-              rules={[{ required: true, message: 'Please select your course!' }]}
+              label={
+                <span style={{ fontWeight: "500", color: "#333" }}>Course</span>
+              }
+              rules={[
+                { required: true, message: "Please select your course!" },
+              ]}
             >
               <Select
                 options={courseOptions}
                 style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  height: '40px',
+                  backgroundColor: "#f9f9f9",
+                  border: "2px solid #6d28d9",
+                  borderRadius: "8px",
+                  height: "40px",
                 }}
               />
             </Form.Item>
 
             <Form.Item
               name="password"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Password</span>}
+              label={
+                <span style={{ fontWeight: "500", color: "#333" }}>
+                  Password
+                </span>
+              }
               rules={[
-                { required: true, message: 'Please input your password!' },
-                { min: 6, message: 'Password must be at least 6 characters long!' },
+                { required: true, message: "Please input your password!" },
                 {
-                  pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-                  message: 'Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character!'
-                }
+                  min: 6,
+                  message: "Password must be at least 6 characters long!",
+                },
+                {
+                  pattern:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+                  message:
+                    "Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character!",
+                },
               ]}
             >
               <Input.Password
                 style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  padding: '0.8rem',
-                  height: '40px',
-                  fontSize: '14px',
+                  backgroundColor: "#f9f9f9",
+                  border: "2px solid #6d28d9",
+                  borderRadius: "8px",
+                  padding: "0.8rem",
+                  height: "40px",
+                  fontSize: "14px",
                 }}
               />
             </Form.Item>
 
             <Form.Item
               name="confirmPassword"
-              label={<span style={{ fontWeight: '500', color: '#333' }}>Confirm Password</span>}
-              dependencies={['password']}
+              label={
+                <span style={{ fontWeight: "500", color: "#333" }}>
+                  Confirm Password
+                </span>
+              }
+              dependencies={["password"]}
               rules={[
-                { required: true, message: 'Please confirm your password!' },
+                { required: true, message: "Please confirm your password!" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
+                    if (!value || getFieldValue("password") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error('Passwords do not match!'));
-                  }
-                })
+                    return Promise.reject(new Error("Passwords do not match!"));
+                  },
+                }),
               ]}
             >
               <Input.Password
                 style={{
-                  backgroundColor: '#f9f9f9',
-                  border: '2px solid #6d28d9',
-                  borderRadius: '8px',
-                  padding: '0.8rem',
-                  height: '40px',
-                  fontSize: '14px',
+                  backgroundColor: "#f9f9f9",
+                  border: "2px solid #6d28d9",
+                  borderRadius: "8px",
+                  padding: "0.8rem",
+                  height: "40px",
+                  fontSize: "14px",
                 }}
               />
             </Form.Item>
@@ -234,34 +243,34 @@ function Signup() {
               disabled={loading}
               className="w-100"
               style={{
-                backgroundColor: '#6d28d9',
-                color: '#fff',
-                border: 'none',
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                padding: '0.85rem 1.5rem',
-                borderRadius: '8px',
+                backgroundColor: "#6d28d9",
+                color: "#fff",
+                border: "none",
+                fontWeight: "bold",
+                fontSize: "1rem",
+                padding: "0.85rem 1.5rem",
+                borderRadius: "8px",
               }}
             >
-              {loading ? 'Signing up...' : 'Sign Up'}
+              {loading ? "Signing up..." : "Sign Up"}
             </Button>
           </Form>
 
           <div
             className="text-center mt-4"
             style={{
-              fontSize: '0.9rem',
-              marginTop: '1.5rem',
+              fontSize: "0.9rem",
+              marginTop: "1.5rem",
             }}
           >
             <p>
-              Already have an account?{' '}
+              Already have an account?{" "}
               <Link
                 to="/login"
                 style={{
-                  color: '#6d28d9',
-                  fontWeight: 'bold',
-                  textDecoration: 'none',
+                  color: "#6d28d9",
+                  fontWeight: "bold",
+                  textDecoration: "none",
                 }}
               >
                 Click here to log in
@@ -271,7 +280,11 @@ function Signup() {
         </div>
       </div>
 
-      <ToastNotification open={toastOpen} setOpen={setToastOpen} message={toastMessage} />
+      <ToastNotification
+        open={toastOpen}
+        setOpen={setToastOpen}
+        message={toastMessage}
+      />
     </div>
   );
 }

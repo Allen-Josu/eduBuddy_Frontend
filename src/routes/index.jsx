@@ -22,118 +22,123 @@ import AdminLogin from "../admin/pages/login";
 import ProtectedRoute from "../admin/components/protectedRoute";
 import UserProtectedRoute from "../components/protectedRoute";
 import AttendanceRegulator from "../pages/attendanceRegulator";
+import OTPVerification from "../pages/otp-verification";
 
 export const router = createBrowserRouter([
-    {
-        path: routePath.home,
-        element: <Home />,
-    },
-    {
-        path: routePath.notes,
-        element: <Notes />,
-    },
-    {
-        path: routePath.pyq,
-        element: <PreviousYear />,
-    },
-    {
-        path: routePath.gradePredictor,
-        element: <GradePredictor />,
-    },
-    {
-        path: routePath.attendanceRegulator,
+  {
+    path: routePath.home,
+    element: <Home />,
+  },
+  {
+    path: routePath.verifyOTP,
+    element: <OTPVerification />,
+  },
+  {
+    path: routePath.notes,
+    element: <Notes />,
+  },
+  {
+    path: routePath.pyq,
+    element: <PreviousYear />,
+  },
+  {
+    path: routePath.gradePredictor,
+    element: <GradePredictor />,
+  },
+  {
+    path: routePath.attendanceRegulator,
+    element: (
+      <UserProtectedRoute>
+        <AttendanceRegulator />
+      </UserProtectedRoute>
+    ),
+  },
+  {
+    path: routePath.adminLogin,
+    element: <AdminLogin />,
+  },
+  {
+    path: routePath.login,
+    element: <Login />,
+  },
+  {
+    path: routePath.signup,
+    element: <Signup />,
+  },
+  {
+    path: routePath.about,
+    element: <About />,
+  },
+  {
+    path: routePath.modelQuestionGenerator,
+    element: (
+      <UserProtectedRoute>
+        <QuestionPaperGenerator />
+      </UserProtectedRoute>
+    ),
+  },
+  {
+    path: routePath.department,
+    element: (
+      <ProtectedRoute>
+        <DepartmentPage />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: `${routePath.viewDepartment}/:entityId`,
         element: (
-            <UserProtectedRoute>
-                <AttendanceRegulator />
-            </UserProtectedRoute>
+          <ProtectedRoute>
+            <ViewDepartment />
+          </ProtectedRoute>
         ),
-    },
-    {
-        path: routePath.adminLogin,
-        element: <AdminLogin />,
-    },
-    {
-        path: routePath.login,
-        element: <Login />,
-    },
-    {
-        path: routePath.signup,
-        element: <Signup />,
-    },
-    {
-        path: routePath.about,
-        element: <About />,
-    },
-    {
-        path: routePath.modelQuestionGenerator,
+      },
+      {
+        path: routePath.addDepartment,
         element: (
-            <UserProtectedRoute>
-                <QuestionPaperGenerator />
-            </UserProtectedRoute>
+          <ProtectedRoute>
+            <AddDepartment />
+          </ProtectedRoute>
         ),
-    },
-    {
-        path: routePath.department,
+      },
+      {
+        path: `${routePath.editDepartment}/:entityId`,
         element: (
-            <ProtectedRoute>
-                <DepartmentPage />
-            </ProtectedRoute>
+          <ProtectedRoute>
+            <EditDepartment />
+          </ProtectedRoute>
         ),
-        children: [
-            {
-                path: `${routePath.viewDepartment}/:entityId`,
-                element: (
-                    <ProtectedRoute>
-                        <ViewDepartment />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: routePath.addDepartment,
-                element: (
-                    <ProtectedRoute>
-                        <AddDepartment />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: `${routePath.editDepartment}/:entityId`,
-                element: (
-                    <ProtectedRoute>
-                        <EditDepartment />
-                    </ProtectedRoute>
-                ),
-            },
-        ],
-    },
-    {
-        path: routePath.users,
+      },
+    ],
+  },
+  {
+    path: routePath.users,
+    element: (
+      <ProtectedRoute>
+        <UsersPage />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        path: `${routePath.addUser}`,
         element: (
-            <ProtectedRoute>
-                <UsersPage />
-            </ProtectedRoute>
+          <ProtectedRoute>
+            <AddUserDrawer />
+          </ProtectedRoute>
         ),
-        children: [
-            {
-                path: `${routePath.addUser}`,
-                element: (
-                    <ProtectedRoute>
-                        <AddUserDrawer />
-                    </ProtectedRoute>
-                ),
-            },
-            {
-                path: `${routePath.viewUser}/:entityId`,
-                element: (
-                    <ProtectedRoute>
-                        <ViewUser />
-                    </ProtectedRoute>
-                ),
-            },
-        ],
-    },
-    {
-        path: "*",
-        element: <PageNotFound />,
-    },
+      },
+      {
+        path: `${routePath.viewUser}/:entityId`,
+        element: (
+          <ProtectedRoute>
+            <ViewUser />
+          </ProtectedRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <PageNotFound />,
+  },
 ]);

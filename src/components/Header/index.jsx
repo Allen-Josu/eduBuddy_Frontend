@@ -2,7 +2,7 @@ import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { useUserStore } from "../../store/userStore";
 import { useState } from "react";
-import ToastNotification from "../../modals/Toast";
+import ToastNotification from "../modals/Toast";
 
 // Navigation items configuration
 const NAV_ITEMS = [

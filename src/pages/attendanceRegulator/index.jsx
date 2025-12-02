@@ -1,19 +1,23 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Header from "../../components/Header";
 import axios from "axios";
-import AttendanceModal from "../../modals/attendance";
+import AttendanceModal from "../../components/modals/attendance";
 import { useUserStore } from "../../store/userStore";
 import dayjs from "dayjs";
 import Calendar from "../../components/ui/calender";
 
 const BASE_URL = import.meta.env.VITE_URL;
-const START_DATE = dayjs(import.meta.env.VITE_START_DATE)  // Fallback to a default date if not set
+const START_DATE = dayjs(import.meta.env.VITE_START_DATE); // Fallback to a default date if not set
 const HOURS_PER_DAY = 6;
 
 // Utility functions
 const countWeekends = (start, end) => {
   let count = 0;
-  for (let date = start; date.isBefore(end) || date.isSame(end, 'day'); date = date.add(1, 'day')) {
+  for (
+    let date = start;
+    date.isBefore(end) || date.isSame(end, "day");
+    date = date.add(1, "day")
+  ) {
     const dayOfWeek = date.day();
     if (dayOfWeek === 0 || dayOfWeek === 6) count++;
   }
@@ -25,23 +29,22 @@ const isWeekend = (date) => {
   return dayOfWeek === 0 || dayOfWeek === 6;
 };
 
-
 const isFutureDate = (date) => date > new Date();
 
 // Custom hook for attendance data
-const useAttendanceData = (studentId, refreshTrigger) => {
+const useAttendanceData = (email, refreshTrigger) => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!studentId) return;
+      if (!email) return;
 
       setIsLoading(true);
       try {
         const response = await axios.get(
-          `${BASE_URL}/attendance?entityType=all&studentId=${studentId}`
+          `${BASE_URL}/attendance?entityType=all&email=${email}`
         );
         setData(response.data.results);
         setError(null);
@@ -54,7 +57,7 @@ const useAttendanceData = (studentId, refreshTrigger) => {
     };
 
     fetchData();
-  }, [studentId, refreshTrigger]);
+  }, [email, refreshTrigger]);
 
   return { data, error, isLoading };
 };
@@ -64,9 +67,9 @@ const useAttendanceCalculations = (attendanceData) => {
   return useMemo(() => {
     if (!attendanceData) return null;
 
-    console.log('====================================');
+    console.log("====================================");
     console.log(attendanceData);
-    console.log('====================================');
+    console.log("====================================");
 
     const currentDate = dayjs();
     let totalDays = currentDate.diff(START_DATE, "day") + 1;
@@ -75,35 +78,42 @@ const useAttendanceCalculations = (attendanceData) => {
     const weekendCount = countWeekends(START_DATE, currentDate);
     totalDays -= weekendCount;
 
-    const leaveStats = attendanceData.reduce((acc, item) => {
-      if (item.leaveDate && dayjs(item.leaveDate).isAfter(START_DATE)) {
-        if (Array.isArray(item.leavePerDay)) {
-          item.leavePerDay.forEach((leave) => {
-            switch (leave.reason) {
-              case "No Class":
-                acc.noClass++;
-                break;
-              case "Duty Leave":
-                acc.dutyLeave++;
-                break;
-              default:
-                acc.otherLeave++;
-                break;
-            }
-          });
+    const leaveStats = attendanceData.reduce(
+      (acc, item) => {
+        if (item.leaveDate && dayjs(item.leaveDate).isAfter(START_DATE)) {
+          if (Array.isArray(item.leavePerDay)) {
+            item.leavePerDay.forEach((leave) => {
+              switch (leave.reason) {
+                case "No Class":
+                  acc.noClass++;
+                  break;
+                case "Duty Leave":
+                  acc.dutyLeave++;
+                  break;
+                default:
+                  acc.otherLeave++;
+                  break;
+              }
+            });
+          }
         }
-      }
-      return acc;
-    }, { noClass: 0, dutyLeave: 0, otherLeave: 0 });
+        return acc;
+      },
+      { noClass: 0, dutyLeave: 0, otherLeave: 0 }
+    );
 
     const totalHours = totalDays * HOURS_PER_DAY - leaveStats.noClass;
     const attendanceWithDuty = totalHours - leaveStats.otherLeave;
-    const attendanceWithoutDuty = totalHours - (leaveStats.otherLeave + leaveStats.dutyLeave);
+    const attendanceWithoutDuty =
+      totalHours - (leaveStats.otherLeave + leaveStats.dutyLeave);
 
     return {
       totalPercent: ((attendanceWithDuty / totalHours) * 100).toFixed(2),
-      totalPercentExcludeDuty: ((attendanceWithoutDuty / totalHours) * 100).toFixed(2),
-      totalHours
+      totalPercentExcludeDuty: (
+        (attendanceWithoutDuty / totalHours) *
+        100
+      ).toFixed(2),
+      totalHours,
     };
   }, [attendanceData]);
 };
@@ -114,8 +124,8 @@ const useMarkedDates = (attendanceData) => {
     if (!attendanceData) return [];
 
     return attendanceData
-      .filter(data => data.leavePerDay && data.leavePerDay.length > 0)
-      .map(data => {
+      .filter((data) => data.leavePerDay && data.leavePerDay.length > 0)
+      .map((data) => {
         const date = dayjs(data.leaveDate);
         return date.isValid() ? date.format("YYYY-MM-DD") : null;
       })
@@ -130,7 +140,11 @@ const AttendanceRegulator = () => {
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const user = useUserStore((state) => state.user);
-  const { data: attendanceData, error, isLoading } = useAttendanceData(user?.studentId, refreshTrigger);
+  const {
+    data: attendanceData,
+    error,
+    isLoading,
+  } = useAttendanceData(user?.email, refreshTrigger);
   const attendanceStats = useAttendanceCalculations(attendanceData);
   const markedDates = useMarkedDates(attendanceData);
 
@@ -150,7 +164,7 @@ const AttendanceRegulator = () => {
   }, []);
 
   const handleOperationSuccess = useCallback(() => {
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
     setShowModal(false);
   }, []);
 
@@ -202,7 +216,9 @@ const AttendanceRegulator = () => {
                       <div className="h-4 bg-gray-200 rounded mb-2"></div>
                       <div className="h-4 bg-gray-200 rounded"></div>
                     </div>
-                    <p className="text-gray-600 mt-4">Loading attendance data...</p>
+                    <p className="text-gray-600 mt-4">
+                      Loading attendance data...
+                    </p>
                   </div>
                 ) : attendanceStats ? (
                   <div className="overflow-x-auto">
@@ -231,10 +247,13 @@ const AttendanceRegulator = () => {
                             Attendance (with duty leave)
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-700">
-                            <span className={`font-semibold ${parseFloat(attendanceStats.totalPercent) >= 75
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                              }`}>
+                            <span
+                              className={`font-semibold ${
+                                parseFloat(attendanceStats.totalPercent) >= 75
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
                               {attendanceStats.totalPercent}%
                             </span>
                           </td>
@@ -244,10 +263,15 @@ const AttendanceRegulator = () => {
                             Attendance (without duty leave)
                           </td>
                           <td className="px-4 sm:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-700">
-                            <span className={`font-semibold ${parseFloat(attendanceStats.totalPercentExcludeDuty) >= 75
-                              ? 'text-green-600'
-                              : 'text-red-600'
-                              }`}>
+                            <span
+                              className={`font-semibold ${
+                                parseFloat(
+                                  attendanceStats.totalPercentExcludeDuty
+                                ) >= 75
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }`}
+                            >
                               {attendanceStats.totalPercentExcludeDuty}%
                             </span>
                           </td>

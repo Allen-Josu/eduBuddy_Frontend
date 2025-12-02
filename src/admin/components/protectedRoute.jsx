@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 import { Navigate } from 'react-router-dom';
-import { useAuthStore } from '../../store/userStore';
+import { useAdminStore } from '../../store/adminStore';
 
 export default function ProtectedRoute({ children }) {
-    const admin = useAuthStore((state) => state.admin);
+    const admin = useAdminStore((state) => state.admin);
 
     if (!admin) {
         return <Navigate to="/admin-login" replace />;

@@ -1,5 +1,5 @@
-import PageLayout from '../../layouts';
 import Header from '../../components/Header';
+import PageLayout from '../../components/layouts';
 
 export default function Notes() {
   return (

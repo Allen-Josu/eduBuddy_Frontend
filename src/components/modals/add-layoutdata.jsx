@@ -2,23 +2,28 @@
 import { Button, Form, Input, Modal, Select } from "antd";
 import FormItem from "antd/es/form/FormItem";
 import TextArea from "antd/es/input/TextArea";
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { SemesterSelectOption } from "../admin/constants";
+import { SemesterSelectOption } from "../../admin/constants";
 import { v4 as uuid } from "uuid";
 import ToastNotification from "./Toast";
 
 const BASE_URL = import.meta.env.VITE_URL;
 
-export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh }) {
+export default function Modals({
+  isModalOpen,
+  setIsModalOpen,
+  entity,
+  setRefresh,
+}) {
   const [responseData, setResponseData] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const navigate = useNavigate();
   const [toastOpen, setToastOpen] = useState(false); // State for toast visibility
-  const [toastMessage, setToastMessage] = useState(''); // State for toast message
+  const [toastMessage, setToastMessage] = useState(""); // State for toast message
   const [data, setData] = useState({
     department: "",
     course: "",
@@ -26,17 +31,17 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
     subjectName: "",
     subjectCode: "",
     description: "",
-    url: ""
+    url: "",
   });
 
   const handleRefresh = () => {
-    setRefresh(prev => prev + 1);
+    setRefresh((prev) => prev + 1);
   };
 
   const resetDependentFields = () => {
     setCourses([]);
     setSubjects([]);
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       course: "",
       semester: "",
@@ -44,19 +49,23 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
       subjectCode: "",
       department: "",
       description: "",
-      url: ""
+      url: "",
     }));
   };
 
   const fetchData = async () => {
     try {
-      const response = await axios.get(`${BASE_URL}/departments?entity=departments`);
+      const response = await axios.get(
+        `${BASE_URL}/departments?entity=departments`
+      );
       setResponseData(response.data.results);
-      
-      const uniqueDepartments = [...new Set(response.data.results.map(item => item.department))];
-      const formattedDepartments = uniqueDepartments.map(dept => ({
+
+      const uniqueDepartments = [
+        ...new Set(response.data.results.map((item) => item.department)),
+      ];
+      const formattedDepartments = uniqueDepartments.map((dept) => ({
         label: dept,
-        value: dept
+        value: dept,
       }));
 
       setDepartments(formattedDepartments);
@@ -71,13 +80,13 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
 
   const handleDepartmentChange = (value) => {
     resetDependentFields();
-    setData(prev => ({ ...prev, department: value }));
+    setData((prev) => ({ ...prev, department: value }));
 
     const departmentCourses = responseData
-      .filter(item => item.department === value)
-      .map(item => ({
+      .filter((item) => item.department === value)
+      .map((item) => ({
         label: item.course,
-        value: item.course
+        value: item.course,
       }));
 
     const uniqueCourses = Array.from(
@@ -88,35 +97,36 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
   };
 
   const handleCourseChange = (value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       course: value,
       semester: "",
       subjectName: "",
-      subjectCode: ""
+      subjectCode: "",
     }));
     setSubjects([]);
   };
 
   const handleSemesterChange = (value) => {
-    setData(prev => ({
+    setData((prev) => ({
       ...prev,
       semester: value,
       subjectName: "",
-      subjectCode: ""
+      subjectCode: "",
     }));
 
     if (data.course && value) {
       const filteredSubjects = responseData
-        .filter(item =>
-          item.department === data.department &&
-          item.course === data.course &&
-          item.semester === value
-        )[0]?.subjects
-        .map(item => ({
+        .filter(
+          (item) =>
+            item.department === data.department &&
+            item.course === data.course &&
+            item.semester === value
+        )[0]
+        ?.subjects.map((item) => ({
           label: item.subjectName,
           value: item.subjectName,
-          code: item.subjectCode // Store the subject code in the option
+          code: item.subjectCode, // Store the subject code in the option
         }));
 
       setSubjects(filteredSubjects);
@@ -125,11 +135,11 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
 
   const handleSubjectChange = (value) => {
     // Find the selected subject's details
-    const selectedSubject = subjects.find(subject => subject.value === value);
-    setData(prev => ({
+    const selectedSubject = subjects.find((subject) => subject.value === value);
+    setData((prev) => ({
       ...prev,
       subjectName: value,
-      subjectCode: selectedSubject?.code || "" // Set the subject code when subject is selected
+      subjectCode: selectedSubject?.code || "", // Set the subject code when subject is selected
     }));
   };
 
@@ -140,34 +150,34 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
       entityId: uuid(),
       likes: 0,
       uploadedBy: user.username,
-      studentId: user.studentId
+      email: user.email,
     };
-  
-    
+
     setToastMessage("Uploading...");
     setToastOpen(true);
-  
+
     try {
       console.log("Submission Data:", submissionData);
-  
-      const response = await axios.post(`${BASE_URL}/newEntity`, submissionData);
-  
+
+      const response = await axios.post(
+        `${BASE_URL}/newEntity`,
+        submissionData
+      );
+
       if (response.status === 200) {
         console.log("Successfully uploaded");
-  
-        
+
         setToastMessage("Uploaded successfully");
-  
-        
+
         setTimeout(() => {
           setIsModalOpen(false);
-          resetDependentFields(); 
+          resetDependentFields();
           handleRefresh(); // Optionally refresh data
-        }, 1500); 
+        }, 1500);
       }
     } catch (error) {
       console.error("Error submitting document:", error);
-  
+
       let errorMessage = "Unexpected server error.";
       if (error.response) {
         errorMessage = error.response.data.message || errorMessage;
@@ -176,7 +186,7 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
       } else {
         errorMessage = error.message;
       }
-  
+
       setToastMessage(`Error: ${errorMessage}`);
       setTimeout(() => {
         setIsModalOpen(false); // Close the modal after showing the error
@@ -184,8 +194,6 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
       }, 1500);
     }
   };
-  
-
 
   return (
     <>
@@ -241,7 +249,9 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
 
           <FormItem label="Description" style={{ width: "100%" }}>
             <Input
-              onChange={(e) => setData(prev => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, description: e.target.value }))
+              }
               value={data.description}
             />
           </FormItem>
@@ -250,7 +260,9 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
             <TextArea
               rows={2}
               style={{ resize: "none" }}
-              onChange={(e) => setData(prev => ({ ...prev, url: e.target.value }))}
+              onChange={(e) =>
+                setData((prev) => ({ ...prev, url: e.target.value }))
+              }
               value={data.url}
             />
           </FormItem>
@@ -263,7 +275,11 @@ export default function Modals({ isModalOpen, setIsModalOpen, entity, setRefresh
             >
               Submit
             </Button>
-            <ToastNotification open={toastOpen} setOpen={setToastOpen} message={toastMessage} />
+            <ToastNotification
+              open={toastOpen}
+              setOpen={setToastOpen}
+              message={toastMessage}
+            />
           </div>
         </Form>
       </Modal>
