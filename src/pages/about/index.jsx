@@ -1,11 +1,19 @@
-import { useState } from 'react';
-import { Mail, Linkedin, Github, Users, Target, Sparkles, Award } from 'lucide-react';
-import pavi from "../../assets/pavi.jpg"
-import roshin from "../../assets/roshin.jpg"
-import allen from "../../assets/allen.jpg"
-import sidharth from "../../assets/sid.jpg"
-import { useNavigate } from 'react-router-dom';
-// Content object containing all the text content
+import { useState } from "react";
+import {
+  Mail,
+  Linkedin,
+  Github,
+  Users,
+  Target,
+  Sparkles,
+  Award,
+} from "lucide-react";
+import pavi from "../../assets/pavi.jpg";
+import roshin from "../../assets/roshin.jpg";
+import allen from "../../assets/allen.jpg";
+import sidharth from "../../assets/sid.jpg";
+import { useNavigate } from "react-router-dom";
+
 const content = {
   title: "EduBuddy",
   introduction: `Welcome to EduBuddy, your ultimate companion in academic success! 
@@ -21,48 +29,48 @@ const content = {
       details: `Access a vast collection of notes uploaded by fellow students.
           Notes are ranked by community votes for credibility and quality, ensuring you get 
           the best study materials. Share your own notes and contribute to the learning community!`,
-      icon: <Users className="w-6 h-6" />
+      icon: <Users className="w-6 h-6" />,
     },
     {
       title: "Grade Calculator",
       details: `Worried about your academic performance? Our grade calculator uses your 
           inputs to estimate your potential grades. Identify areas of improvement and stay ahead in your studies.`,
-      icon: <Target className="w-6 h-6" />
+      icon: <Target className="w-6 h-6" />,
     },
     {
       title: "Model Question Paper Generator",
       details: `Create tailored question papers from your syllabus and previous year questions (PYQ).
           Perfect for exam preparation and practice.`,
-      icon: <Sparkles className="w-6 h-6" />
+      icon: <Sparkles className="w-6 h-6" />,
     },
     {
       title: "Attendance Calculator",
       details: `Keep track of your attendance effortlessly. Calculate your total attendance and ensure 
           you maintain the required minimum to stay compliant with your institution's policies.`,
-      icon: <Award className="w-6 h-6" />
+      icon: <Award className="w-6 h-6" />,
     },
     {
       title: "Access to Previous Year Question Papers",
       details: `Browse a collection of past question papers to understand exam patterns and frequently 
           asked questions. Use these as a guide to prepare effectively for your exams.`,
-      icon: <Users className="w-6 h-6" />
-    }
+      icon: <Users className="w-6 h-6" />,
+    },
   ],
   benefits: [
     "Student-Centric Design: Every feature is built with students' needs in mind.",
     "Community-Driven: Contribute, collaborate, and learn from a thriving community of students.",
     "Efficiency at Its Best: From predicting grades to managing attendance, EduBuddy saves you time and helps you focus on what truly matters—learning.",
-    "Reliable Resources: All content is vetted by community voting to ensure quality and relevance."
+    "Reliable Resources: All content is vetted by community voting to ensure quality and relevance.",
   ],
   callToAction: `Whether you're looking to ace your exams, stay on top of your attendance, or share 
   and discover valuable notes, EduBuddy is here to support your academic journey. Together, let's 
   make learning more effective and enjoyable!`,
-  slogan: "Your education, your buddy—EduBuddy"
+  slogan: "Your education, your buddy—EduBuddy",
 };
 
 export default function About() {
   const [hoveredMember, setHoveredMember] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Team members data array
   const teamMembers = [
@@ -73,7 +81,7 @@ export default function About() {
       email: "allenalackaparambil@gmail.com",
       linkedin: "http://www.linkedin.com/in/allen-joseph-joy",
       github: "https://github.com/Allen-Josu",
-      gradient: "from-blue-400 to-purple-600"
+      gradient: "from-blue-400 to-purple-600",
     },
     {
       name: "Roshin Sleeba C",
@@ -82,7 +90,7 @@ export default function About() {
       email: "roshinsleebac2002@gmail.com",
       linkedin: "https://www.linkedin.com/in/roshin-sleeba-c-112466320",
       github: "https://github.com/Roshinsleeba",
-      gradient: "from-green-400 to-blue-600"
+      gradient: "from-green-400 to-blue-600",
     },
     {
       name: "Sidharth P R",
@@ -91,7 +99,7 @@ export default function About() {
       email: "sidharthprsidhu@gmail.com",
       linkedin: "https://www.linkedin.com/in/sidharth-p-r-8088a0327",
       github: "https://github.com/Sidharthpr",
-      gradient: "from-purple-400 to-pink-600"
+      gradient: "from-purple-400 to-pink-600",
     },
     {
       name: "Pavi Sankar N P",
@@ -100,7 +108,7 @@ export default function About() {
       email: "pavisankarneelamana@gmail.com",
       linkedin: "https://www.linkedin.com/in/pavi-sankar-n-p-492518290",
       github: "https://github.com/pavi-sankar",
-      gradient: "from-orange-400 to-red-600"
+      gradient: "from-orange-400 to-red-600",
     },
   ];
 
@@ -124,12 +132,15 @@ export default function About() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-16">
-
         {/* Team Section */}
         <section className="mb-20">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Meet Our Core Team</h2>
-            <p className="text-xl text-gray-400">The brilliant minds behind EduBuddy</p>
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Meet Our Core Team
+            </h2>
+            <p className="text-xl text-gray-400">
+              The brilliant minds behind EduBuddy
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -140,9 +151,15 @@ export default function About() {
                 onMouseEnter={() => setHoveredMember(index)}
                 onMouseLeave={() => setHoveredMember(null)}
               >
-                <div className={`relative bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl ${hoveredMember === index ? 'shadow-xl' : ''}`}>
+                <div
+                  className={`relative bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 transition-all duration-500 hover:scale-105 hover:shadow-2xl ${
+                    hoveredMember === index ? "shadow-xl" : ""
+                  }`}
+                >
                   {/* Gradient overlay on hover */}
-                  <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${member.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
+                  <div
+                    className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${member.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
+                  ></div>
 
                   {/* Profile Image */}
                   <div className="relative mb-4">
@@ -153,13 +170,19 @@ export default function About() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${member.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
+                    <div
+                      className={`absolute inset-0 rounded-full bg-gradient-to-br ${member.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+                    ></div>
                   </div>
 
                   {/* Member Info */}
                   <div className="text-center">
-                    <h3 className="text-xl font-bold text-white mb-1">{member.name}</h3>
-                    <p className="text-purple-400 text-sm font-medium mb-4">{member.role}</p>
+                    <h3 className="text-xl font-bold text-white mb-1">
+                      {member.name}
+                    </h3>
+                    <p className="text-purple-400 text-sm font-medium mb-4">
+                      {member.role}
+                    </p>
 
                     {/* Social Links */}
                     <div className="flex justify-center gap-4">
@@ -195,7 +218,6 @@ export default function About() {
 
         {/* About Content */}
         <section className="space-y-20">
-
           {/* Introduction */}
           <div className="text-center max-w-4xl mx-auto">
             <p className="text-xl text-gray-300 leading-relaxed">
@@ -205,8 +227,12 @@ export default function About() {
 
           {/* Features */}
           <div>
-            <h2 className="text-4xl font-bold text-center text-white mb-4">What We Offer</h2>
-            <p className="text-xl text-gray-400 text-center mb-12">Comprehensive tools for your academic success</p>
+            <h2 className="text-4xl font-bold text-center text-white mb-4">
+              What We Offer
+            </h2>
+            <p className="text-xl text-gray-400 text-center mb-12">
+              Comprehensive tools for your academic success
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {content.features.map((feature, index) => (
@@ -218,9 +244,13 @@ export default function About() {
                     <div className="p-3 rounded-full bg-purple-600/20 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
                       {feature.icon}
                     </div>
-                    <h3 className="text-xl font-bold text-white ml-4">{feature.title}</h3>
+                    <h3 className="text-xl font-bold text-white ml-4">
+                      {feature.title}
+                    </h3>
                   </div>
-                  <p className="text-gray-300 leading-relaxed">{feature.details}</p>
+                  <p className="text-gray-300 leading-relaxed">
+                    {feature.details}
+                  </p>
                 </div>
               ))}
             </div>
@@ -228,18 +258,19 @@ export default function About() {
 
           {/* Benefits */}
           <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 rounded-3xl p-12 border border-purple-500/20">
-            <h2 className="text-4xl font-bold text-center text-white mb-12">Why Choose EduBuddy?</h2>
+            <h2 className="text-4xl font-bold text-center text-white mb-12">
+              Why Choose EduBuddy?
+            </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {content.benefits.map((benefit, index) => (
-                <div
-                  key={index}
-                  className="flex items-start space-x-4 group"
-                >
+                <div key={index} className="flex items-start space-x-4 group">
                   <div className="p-2 rounded-full bg-purple-600/20 text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300 flex-shrink-0">
                     <Award className="w-5 h-5" />
                   </div>
-                  <p className="text-lg text-gray-300 leading-relaxed">{benefit}</p>
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    {benefit}
+                  </p>
                 </div>
               ))}
             </div>
@@ -255,14 +286,12 @@ export default function About() {
               &quot;{content.slogan}&quot;
             </p>
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate("/login")}
               className="bg-white text-purple-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg hover:shadow-xl"
             >
               Get Started Now
             </button>
-
           </div>
-
         </section>
       </div>
 

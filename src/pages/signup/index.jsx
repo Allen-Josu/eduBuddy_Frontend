@@ -27,8 +27,9 @@ function Signup() {
     setLoading(true);
 
     try {
-      const { ...dataToSend } = values;
+      const { confirmPassword, ...dataToSend } = values;
 
+      // Register user
       await axios.post(`${BASE_URL}/users/`, {
         ...dataToSend,
         entityId: uuid(),
@@ -37,11 +38,20 @@ function Signup() {
         department: "DCA",
       });
 
+      // Send OTP
       await axios.post(`${BASE_URL}/send-otp`, { email: dataToSend.email });
 
       setToastMessage("An OTP has been sent to your email");
       setToastOpen(true);
-      setTimeout(() => navigate("/verify-otp"), 2000);
+
+      // Navigate with email in state
+      setTimeout(() => {
+        navigate("/verify-otp", {
+          state: {
+            email: dataToSend.email,
+          },
+        });
+      }, 2000);
     } catch (err) {
       setError(
         err.response?.data?.message ||

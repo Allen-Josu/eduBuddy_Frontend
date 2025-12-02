@@ -1,21 +1,33 @@
 import { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_URL;
 
 export default function OTPVerification() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const email = location.state?.email;
+
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const inputRefs = useRef([]);
 
   useEffect(() => {
+    // Redirect to signup if no email is provided
+    if (!email) {
+      navigate("/signup");
+      return;
+    }
+
     // Focus first input on mount
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
-  }, []);
+  }, [email, navigate]);
 
   const handleChange = (index, value) => {
     // Only allow digits
@@ -68,15 +80,22 @@ export default function OTPVerification() {
     setError("");
 
     try {
-      // Replace with your actual API endpoint
-      const response = await axios.post(`${BASE_URL}/api/verify-otp`, {
-        
+      const response = await axios.post(`${BASE_URL}/verify-otp`, {
+        email: email,
         otp: otpString,
       });
 
       if (response.data.success) {
         setSuccess(true);
         setError("");
+        // Redirect to login after 2 seconds
+        setTimeout(() => {
+          navigate("/login", {
+            state: {
+              message: "Email verified successfully! Please login.",
+            },
+          });
+        }, 2000);
       } else {
         setError(response.data.message || "Invalid OTP");
       }
@@ -90,27 +109,48 @@ export default function OTPVerification() {
   };
 
   const handleResend = async () => {
+    setIsResending(true);
     setOtp(["", "", "", "", "", ""]);
     setError("");
     setSuccess(false);
-    inputRefs.current[0]?.focus();
 
     try {
-      // Add your resend OTP API call here
-      await axios.post(`${BASE_URL}/api/resend-otp`);
+      await axios.post(`${BASE_URL}/send-otp`, { email: email });
+      setError("");
+      // Show success message
+      const successMsg = document.createElement("div");
+      successMsg.className =
+        "bg-green-100 text-green-700 text-sm rounded-lg p-3 mb-4";
+      successMsg.textContent = "OTP resent successfully!";
+      document.querySelector(".otp-container")?.prepend(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+
+      inputRefs.current[0]?.focus();
     } catch (err) {
-      setError("Failed to resend OTP. Please try again.");
+      setError(
+        err.response?.data?.message || "Failed to resend OTP. Please try again."
+      );
+    } finally {
+      setIsResending(false);
     }
   };
 
+  // Don't render if no email (will redirect)
+  if (!email) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-800 flex justify-center items-center p-8">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+      <div className="otp-container w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         <h2 className="text-center text-2xl font-bold text-violet-700 pb-6">
           Verify Your OTP
         </h2>
-        <p className="text-center text-gray-600 text-sm mb-6">
-          Enter the 6-digit code sent to your device
+        <p className="text-center text-gray-600 text-sm mb-2">
+          Enter the 6-digit code sent to
+        </p>
+        <p className="text-center text-violet-700 font-semibold text-sm mb-6">
+          {email}
         </p>
 
         {success ? (
@@ -134,7 +174,7 @@ export default function OTPVerification() {
               Verification Successful!
             </h3>
             <p className="text-gray-600 text-sm">
-              Your OTP has been verified successfully.
+              Redirecting to login page...
             </p>
           </div>
         ) : (
@@ -166,22 +206,31 @@ export default function OTPVerification() {
             <button
               onClick={handleVerify}
               disabled={isVerifying || otp.join("").length !== 6}
-              className="w-full mt-6 bg-violet-700 text-white font-bold text-base py-3 rounded-lg hover:bg-violet-800 transition-all duration-300 disabled:opacity-50"
+              className="w-full mt-6 bg-violet-700 text-white font-bold text-base py-3 rounded-lg hover:bg-violet-800 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isVerifying ? "Verifying..." : "Verify OTP"}
             </button>
 
             <div className="mt-6 text-center text-sm">
-              <p>
+              <p className="text-gray-600">
                 Didn&apos;t receive the code?{" "}
                 <button
                   onClick={handleResend}
-                  disabled={isVerifying}
-                  className="text-violet-700 font-bold hover:underline disabled:opacity-50"
+                  disabled={isVerifying || isResending}
+                  className="text-violet-700 font-bold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Resend
+                  {isResending ? "Sending..." : "Resend"}
                 </button>
               </p>
+            </div>
+
+            <div className="mt-4 text-center">
+              <button
+                onClick={() => navigate("/signup")}
+                className="text-gray-600 text-sm hover:text-violet-700 transition-colors"
+              >
+                ← Back to Signup
+              </button>
             </div>
           </>
         )}
